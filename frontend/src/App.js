@@ -1,24 +1,45 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 function App() {
 
-  const [message, setMessage] = useState("");
+  const [state, setState] = useState("");
 
-  useEffect(() => {
-    fetch("https://myproject-backend-x6p5.onrender.com/api")
-      .then((res) => res.json())
-      .then((data) => {
-        setMessage(data.message);
-      });
-  }, []);
+  const states = [
+    "Andhra Pradesh",
+    "Telangana",
+    "Tamil Nadu",
+    "Karnataka"
+  ];
 
   return (
     <div style={{ padding: "30px" }}>
+
       <h1>Village Search System 🚀</h1>
 
-      <h2>Backend Message:</h2>
+      <h2>Select State</h2>
 
-      <p>{message}</p>
+      <select
+        value={state}
+        onChange={(e) => setState(e.target.value)}
+        style={{
+          padding: "10px",
+          width: "300px",
+          fontSize: "18px"
+        }}
+      >
+        <option value="">Choose State</option>
+
+        {states.map((item, index) => (
+          <option key={index} value={item}>
+            {item}
+          </option>
+        ))}
+      </select>
+
+      <h2 style={{ marginTop: "30px" }}>
+        Selected State: {state}
+      </h2>
+
     </div>
   );
 }
