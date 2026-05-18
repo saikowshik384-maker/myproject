@@ -18,6 +18,10 @@ function App() {
 
   const [search, setSearch] = useState("");
 
+  // DARK MODE
+
+  const [darkMode, setDarkMode] = useState(true);
+
   // LOAD EXCEL FILE
 
   useEffect(() => {
@@ -157,9 +161,26 @@ function App() {
 
   return (
 
-    <div className="main-container">
+    <div className={darkMode ? "main-container dark" : "main-container light"}>
 
       <div className="glass-card">
+
+        {/* THEME BUTTON */}
+
+        <div className="theme-toggle">
+
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="theme-button"
+          >
+
+            {darkMode
+              ? "☀️ Light Mode"
+              : "🌙 Dark Mode"}
+
+          </button>
+
+        </div>
 
         <h1 className="title">
           🌍 Village Search System
@@ -373,7 +394,7 @@ function App() {
               🌍 View on Google Maps
             </button>
 
-            {/* LIVE GOOGLE MAP */}
+            {/* LIVE MAP */}
 
             <div className="map-container">
 

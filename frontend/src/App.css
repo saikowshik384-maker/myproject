@@ -1,10 +1,21 @@
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.dark {
   background: linear-gradient(
     135deg,
     #1e3c72,
     #2a5298
+  );
+}
+
+.light {
+  background: linear-gradient(
+    135deg,
+    #f5f7fa,
+    #c3cfe2
   );
 }
 
@@ -37,6 +48,28 @@ body {
   text-align: center;
   margin-bottom: 40px;
   font-size: 20px;
+}
+
+.theme-toggle {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.theme-button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 12px;
+  background: white;
+  color: #333;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.theme-button:hover {
+  transform: scale(1.05);
 }
 
 .input-group {
