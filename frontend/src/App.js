@@ -1,174 +1,146 @@
-import React, { useState } from "react";
+import "./App.css";
+import { useState } from "react";
 
 function App() {
-
-  const [state, setState] = useState("");
-  const [district, setDistrict] = useState("");
-  const [village, setVillage] = useState("");
-  const [search, setSearch] = useState("");
-
   const data = {
     "Andhra Pradesh": {
       Krishna: ["Vijayawada", "Machilipatnam", "Gudivada"],
-      Guntur: ["Tenali", "Mangalagiri", "Sattenapalli"],
-      NTR: ["Ibrahimpatnam", "Tiruvuru", "Kanchikacherla"]
+      Guntur: ["Tenali", "Mangalagiri", "Bapatla"],
+      NTR: ["Ibrahimpatnam", "Tiruvuru", "Jaggaiahpet"],
     },
 
     Telangana: {
       Hyderabad: ["Madhapur", "Gachibowli", "Kukatpally"],
-      Warangal: ["Hanamkonda", "Kazipet", "Parkal"]
-    }
+      Warangal: ["Hanamkonda", "Kazipet", "Parkal"],
+      Karimnagar: ["Huzurabad", "Jammikunta", "Manakondur"],
+    },
   };
 
+  const [selectedState, setSelectedState] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedVillage, setSelectedVillage] = useState("");
+  const [search, setSearch] = useState("");
+
+  const states = Object.keys(data);
+
+  const districts = selectedState
+    ? Object.keys(data[selectedState])
+    : [];
+
   const villages =
-    state && district
-      ? data[state][district]
+    selectedState && selectedDistrict
+      ? data[selectedState][selectedDistrict]
       : [];
 
-  const filteredVillages = villages.filter((item) =>
-    item.toLowerCase().includes(search.toLowerCase())
+  const filteredVillages = villages.filter((village) =>
+    village.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
+    <div className="container">
+      <h1 className="title">
+        Village Search System 🚀
+      </h1>
 
-    <div style={{ padding: "30px" }}>
-
-      <h1>Village Search System 🚀</h1>
-
-      {/* STATE */}
-
-      <h2>Select State</h2>
+      {/* State */}
+      <h2 className="label">
+        Select State
+      </h2>
 
       <select
-        value={state}
+        className="select-box"
+        value={selectedState}
         onChange={(e) => {
-          setState(e.target.value);
-          setDistrict("");
-          setVillage("");
-        }}
-        style={{
-          padding: "10px",
-          width: "300px",
-          fontSize: "18px"
+          setSelectedState(e.target.value);
+          setSelectedDistrict("");
+          setSelectedVillage("");
         }}
       >
+        <option value="">Choose State</option>
 
-        <option value="">
-          Choose State
-        </option>
-
-        {Object.keys(data).map((item, index) => (
-
-          <option key={index} value={item}>
-            {item}
+        {states.map((state, index) => (
+          <option key={index} value={state}>
+            {state}
           </option>
-
         ))}
-
       </select>
 
-      {/* DISTRICT */}
+      {/* District */}
+      {selectedState && (
+        <>
+          <h2 className="label">
+            Select District
+          </h2>
 
-      <h2 style={{ marginTop: "30px" }}>
-        Select District
-      </h2>
+          <select
+            className="select-box"
+            value={selectedDistrict}
+            onChange={(e) => {
+              setSelectedDistrict(e.target.value);
+              setSelectedVillage("");
+            }}
+          >
+            <option value="">Choose District</option>
 
-      <select
-        value={district}
-        onChange={(e) => {
-          setDistrict(e.target.value);
-          setVillage("");
-        }}
-        style={{
-          padding: "10px",
-          width: "300px",
-          fontSize: "18px"
-        }}
-      >
+            {districts.map((district, index) => (
+              <option key={index} value={district}>
+                {district}
+              </option>
+            ))}
+          </select>
+        </>
+      )}
 
-        <option value="">
-          Choose District
-        </option>
+      {/* Village */}
+      {selectedDistrict && (
+        <>
+          <h2 className="label">
+            Search Village
+          </h2>
 
-        {state &&
-          Object.keys(data[state]).map((item, index) => (
+          <input
+            className="search-box"
+            type="text"
+            placeholder="Type village name..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
 
-            <option key={index} value={item}>
-              {item}
-            </option>
+          <h2 className="label">
+            Select Village
+          </h2>
 
-          ))}
+          <select
+            className="select-box"
+            value={selectedVillage}
+            onChange={(e) => setSelectedVillage(e.target.value)}
+          >
+            <option value="">Choose Village</option>
 
-      </select>
+            {filteredVillages.map((village, index) => (
+              <option key={index} value={village}>
+                {village}
+              </option>
+            ))}
+          </select>
+        </>
+      )}
 
-      {/* SEARCH */}
-
-      <h2 style={{ marginTop: "30px" }}>
-        Search Village
-      </h2>
-
-      <input
-        type="text"
-        placeholder="Type village name..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        style={{
-          padding: "10px",
-          width: "280px",
-          fontSize: "18px"
-        }}
-      />
-
-      {/* VILLAGE */}
-
-      <h2 style={{ marginTop: "30px" }}>
-        Select Village
-      </h2>
-
-      <select
-        value={village}
-        onChange={(e) => setVillage(e.target.value)}
-        style={{
-          padding: "10px",
-          width: "300px",
-          fontSize: "18px"
-        }}
-      >
-
-        <option value="">
-          Choose Village
-        </option>
-
-        {filteredVillages.map((item, index) => (
-
-          <option key={index} value={item}>
-            {item}
-          </option>
-
-        ))}
-
-      </select>
-
-      {/* RESULTS */}
-
-      <div style={{ marginTop: "40px" }}>
-
+      {/* Results */}
+      <div className="result-box">
         <h2>
-          Selected State: {state}
+          Selected State: {selectedState}
         </h2>
 
         <h2>
-          Selected District: {district}
+          Selected District: {selectedDistrict}
         </h2>
 
         <h2>
-          Selected Village: {village}
+          Selected Village: {selectedVillage}
         </h2>
-
       </div>
-
     </div>
-
   );
 }
 
