@@ -5,6 +5,7 @@ function App() {
   const [state, setState] = useState("");
   const [district, setDistrict] = useState("");
   const [village, setVillage] = useState("");
+  const [search, setSearch] = useState("");
 
   const data = {
     "Andhra Pradesh": {
@@ -15,12 +16,21 @@ function App() {
 
     Telangana: {
       Hyderabad: ["Madhapur", "Gachibowli", "Kukatpally"],
-      Warangal: ["Hanamkonda", "Kazipet", "Parkal"],
-      Karimnagar: ["Jammikunta", "Huzurabad", "Manakondur"]
+      Warangal: ["Hanamkonda", "Kazipet", "Parkal"]
     }
   };
 
+  const villages =
+    state && district
+      ? data[state][district]
+      : [];
+
+  const filteredVillages = villages.filter((item) =>
+    item.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
+
     <div style={{ padding: "30px" }}>
 
       <h1>Village Search System 🚀</h1>
@@ -42,13 +52,19 @@ function App() {
           fontSize: "18px"
         }}
       >
-        <option value="">Choose State</option>
+
+        <option value="">
+          Choose State
+        </option>
 
         {Object.keys(data).map((item, index) => (
+
           <option key={index} value={item}>
             {item}
           </option>
+
         ))}
+
       </select>
 
       {/* DISTRICT */}
@@ -69,15 +85,39 @@ function App() {
           fontSize: "18px"
         }}
       >
-        <option value="">Choose District</option>
+
+        <option value="">
+          Choose District
+        </option>
 
         {state &&
           Object.keys(data[state]).map((item, index) => (
+
             <option key={index} value={item}>
               {item}
             </option>
+
           ))}
+
       </select>
+
+      {/* SEARCH */}
+
+      <h2 style={{ marginTop: "30px" }}>
+        Search Village
+      </h2>
+
+      <input
+        type="text"
+        placeholder="Type village name..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        style={{
+          padding: "10px",
+          width: "280px",
+          fontSize: "18px"
+        }}
+      />
 
       {/* VILLAGE */}
 
@@ -94,32 +134,41 @@ function App() {
           fontSize: "18px"
         }}
       >
-        <option value="">Choose Village</option>
 
-        {state &&
-          district &&
-          data[state][district].map((item, index) => (
-            <option key={index} value={item}>
-              {item}
-            </option>
-          ))}
+        <option value="">
+          Choose Village
+        </option>
+
+        {filteredVillages.map((item, index) => (
+
+          <option key={index} value={item}>
+            {item}
+          </option>
+
+        ))}
+
       </select>
 
       {/* RESULTS */}
 
-      <h2 style={{ marginTop: "40px" }}>
-        Selected State: {state}
-      </h2>
+      <div style={{ marginTop: "40px" }}>
 
-      <h2>
-        Selected District: {district}
-      </h2>
+        <h2>
+          Selected State: {state}
+        </h2>
 
-      <h2>
-        Selected Village: {village}
-      </h2>
+        <h2>
+          Selected District: {district}
+        </h2>
+
+        <h2>
+          Selected Village: {village}
+        </h2>
+
+      </div>
 
     </div>
+
   );
 }
 
