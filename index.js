@@ -1,5 +1,9 @@
 const express = require("express");
+const cors = require("cors");
+
 const app = express();
+
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("Backend is running");
@@ -7,7 +11,7 @@ app.get("/", (req, res) => {
 
 app.get("/api", (req, res) => {
   res.json({
-    message: "API working successfully"
+    message: "Backend Connected Successfully 🚀"
   });
 });
 
