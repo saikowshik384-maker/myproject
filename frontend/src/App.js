@@ -2,6 +2,7 @@ import "./App.css";
 import { useState } from "react";
 
 function App() {
+
   const data = {
     "Andhra Pradesh": {
       Krishna: ["Vijayawada", "Machilipatnam", "Gudivada"],
@@ -37,109 +38,146 @@ function App() {
   );
 
   return (
-    <div className="container">
-      <h1 className="title">
-        Village Search System 🚀
-      </h1>
+    <div className="main-container">
 
-      {/* State */}
-      <h2 className="label">
-        Select State
-      </h2>
+      <div className="glass-card">
 
-      <select
-        className="select-box"
-        value={selectedState}
-        onChange={(e) => {
-          setSelectedState(e.target.value);
-          setSelectedDistrict("");
-          setSelectedVillage("");
-        }}
-      >
-        <option value="">Choose State</option>
+        <h1 className="title">
+          🌍 Village Search System
+        </h1>
 
-        {states.map((state, index) => (
-          <option key={index} value={state}>
-            {state}
-          </option>
-        ))}
-      </select>
+        <p className="subtitle">
+          Search villages easily using dropdown filters
+        </p>
 
-      {/* District */}
-      {selectedState && (
-        <>
-          <h2 className="label">
-            Select District
-          </h2>
+        {/* STATE */}
+
+        <div className="input-group">
+
+          <label>Select State</label>
 
           <select
-            className="select-box"
-            value={selectedDistrict}
+            value={selectedState}
             onChange={(e) => {
-              setSelectedDistrict(e.target.value);
+              setSelectedState(e.target.value);
+              setSelectedDistrict("");
               setSelectedVillage("");
             }}
           >
-            <option value="">Choose District</option>
+            <option value="">
+              Choose State
+            </option>
 
-            {districts.map((district, index) => (
-              <option key={index} value={district}>
-                {district}
+            {states.map((state, index) => (
+              <option key={index} value={state}>
+                {state}
               </option>
             ))}
           </select>
-        </>
-      )}
 
-      {/* Village */}
-      {selectedDistrict && (
-        <>
-          <h2 className="label">
-            Search Village
-          </h2>
+        </div>
 
-          <input
-            className="search-box"
-            type="text"
-            placeholder="Type village name..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        {/* DISTRICT */}
 
-          <h2 className="label">
-            Select Village
-          </h2>
+        {selectedState && (
 
-          <select
-            className="select-box"
-            value={selectedVillage}
-            onChange={(e) => setSelectedVillage(e.target.value)}
-          >
-            <option value="">Choose Village</option>
+          <div className="input-group">
 
-            {filteredVillages.map((village, index) => (
-              <option key={index} value={village}>
-                {village}
+            <label>Select District</label>
+
+            <select
+              value={selectedDistrict}
+              onChange={(e) => {
+                setSelectedDistrict(e.target.value);
+                setSelectedVillage("");
+              }}
+            >
+              <option value="">
+                Choose District
               </option>
-            ))}
-          </select>
-        </>
-      )}
 
-      {/* Results */}
-      <div className="result-box">
-        <h2>
-          Selected State: {selectedState}
-        </h2>
+              {districts.map((district, index) => (
+                <option key={index} value={district}>
+                  {district}
+                </option>
+              ))}
 
-        <h2>
-          Selected District: {selectedDistrict}
-        </h2>
+            </select>
 
-        <h2>
-          Selected Village: {selectedVillage}
-        </h2>
+          </div>
+
+        )}
+
+        {/* SEARCH */}
+
+        {selectedDistrict && (
+
+          <>
+
+            <div className="input-group">
+
+              <label>Search Village</label>
+
+              <input
+                type="text"
+                placeholder="Type village name..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+
+            </div>
+
+            {/* VILLAGE */}
+
+            <div className="input-group">
+
+              <label>Select Village</label>
+
+              <select
+                value={selectedVillage}
+                onChange={(e) => setSelectedVillage(e.target.value)}
+              >
+
+                <option value="">
+                  Choose Village
+                </option>
+
+                {filteredVillages.map((village, index) => (
+                  <option key={index} value={village}>
+                    {village}
+                  </option>
+                ))}
+
+              </select>
+
+            </div>
+
+          </>
+
+        )}
+
+        {/* RESULT */}
+
+        <div className="result-card">
+
+          <h2>📍 Selected Details</h2>
+
+          <p>
+            <strong>State:</strong> {selectedState || "-"}
+          </p>
+
+          <p>
+            <strong>District:</strong> {selectedDistrict || "-"}
+          </p>
+
+          <p>
+            <strong>Village:</strong> {selectedVillage || "-"}
+          </p>
+
+        </div>
+
       </div>
+
     </div>
   );
 }
