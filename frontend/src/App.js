@@ -16,6 +16,10 @@ function App() {
   const [selectedSubdistrict, setSelectedSubdistrict] = useState("");
   const [selectedVillage, setSelectedVillage] = useState("");
 
+  // SEARCH STATE
+
+  const [search, setSearch] = useState("");
+
   // LOAD EXCEL FILE
 
   useEffect(() => {
@@ -37,9 +41,13 @@ function App() {
         setData(jsonData);
 
         const uniqueStates = [
+
           ...new Set(
-            jsonData.map((item) => item["STATE NAME"])
+            jsonData.map(
+              (item) => item["STATE NAME"]
+            )
           )
+
         ];
 
         setStates(uniqueStates);
@@ -59,14 +67,20 @@ function App() {
     setSelectedVillage("");
 
     const filteredDistricts = [
+
       ...new Set(
+
         data
           .filter(
             (item) =>
               item["STATE NAME"] === state
           )
-          .map((item) => item["DISTRICT NAME"])
+          .map(
+            (item) => item["DISTRICT NAME"]
+          )
+
       )
+
     ];
 
     setDistricts(filteredDistricts);
@@ -85,15 +99,21 @@ function App() {
     setSelectedVillage("");
 
     const filteredSubdistricts = [
+
       ...new Set(
+
         data
           .filter(
             (item) =>
               item["STATE NAME"] === selectedState &&
               item["DISTRICT NAME"] === district
           )
-          .map((item) => item["SUB-DISTRICT NAME"])
+          .map(
+            (item) => item["SUB-DISTRICT NAME"]
+          )
+
       )
+
     ];
 
     setSubdistricts(filteredSubdistricts);
@@ -110,7 +130,9 @@ function App() {
     setSelectedVillage("");
 
     const filteredVillages = [
+
       ...new Set(
+
         data
           .filter(
             (item) =>
@@ -118,12 +140,22 @@ function App() {
               item["DISTRICT NAME"] === selectedDistrict &&
               item["SUB-DISTRICT NAME"] === subdistrict
           )
-          .map((item) => item["Area Name"])
+          .map(
+            (item) => item["Area Name"]
+          )
+
       )
+
     ];
 
     setVillages(filteredVillages);
   };
+
+  // SEARCH FILTER
+
+  const filteredVillages = villages.filter((village) =>
+    village.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
 
@@ -249,6 +281,27 @@ function App() {
 
         )}
 
+        {/* SEARCH */}
+
+        {selectedSubdistrict && (
+
+          <div className="input-group">
+
+            <label>Search Village</label>
+
+            <input
+              type="text"
+              placeholder="Type village name..."
+              value={search}
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
+            />
+
+          </div>
+
+        )}
+
         {/* VILLAGE */}
 
         {selectedSubdistrict && (
@@ -268,7 +321,7 @@ function App() {
                 Choose Village
               </option>
 
-              {villages.map((village, index) => (
+              {filteredVillages.map((village, index) => (
 
                 <option
                   key={index}
