@@ -96,6 +96,12 @@ body {
   transform: scale(1.03);
 }
 
+.map-container {
+  margin-top: 25px;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
 @media screen and (max-width: 768px) {
 
   .glass-card {

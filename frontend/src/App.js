@@ -373,6 +373,26 @@ function App() {
               🌍 View on Google Maps
             </button>
 
+            {/* LIVE GOOGLE MAP */}
+
+            <div className="map-container">
+
+              <iframe
+                title="Village Map"
+                width="100%"
+                height="350"
+                style={{
+                  border: 0,
+                  borderRadius: "15px",
+                  marginTop: "20px"
+                }}
+                loading="lazy"
+                allowFullScreen
+                src={`https://www.google.com/maps?q=${selectedVillage}&output=embed`}
+              ></iframe>
+
+            </div>
+
           </div>
 
         )}
