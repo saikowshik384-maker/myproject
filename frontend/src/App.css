@@ -1,100 +1,131 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
+  margin: 0;
   font-family: Arial, Helvetica, sans-serif;
-  background: linear-gradient(135deg, #1e3c72, #2a5298);
-  min-height: 100vh;
+  background: linear-gradient(
+    135deg,
+    #1e3c72,
+    #2a5298
+  );
 }
 
 .main-container {
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
   padding: 20px;
 }
 
 .glass-card {
   width: 100%;
-  max-width: 550px;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(15px);
-  border-radius: 20px;
-  padding: 35px;
-  box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 700px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 25px;
+  padding: 40px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0px 8px 30px rgba(0,0,0,0.3);
   color: white;
 }
 
 .title {
   text-align: center;
-  font-size: 38px;
+  font-size: 52px;
   margin-bottom: 10px;
 }
 
 .subtitle {
   text-align: center;
-  margin-bottom: 30px;
-  color: #dbeafe;
-  font-size: 16px;
+  margin-bottom: 40px;
+  font-size: 20px;
 }
 
 .input-group {
-  margin-bottom: 25px;
+  margin-bottom: 30px;
 }
 
 .input-group label {
   display: block;
   margin-bottom: 10px;
-  font-size: 18px;
+  font-size: 24px;
   font-weight: bold;
 }
 
 .input-group select,
 .input-group input {
   width: 100%;
-  padding: 14px;
-  border-radius: 12px;
+  padding: 18px;
+  border-radius: 15px;
   border: none;
-  font-size: 17px;
+  font-size: 20px;
   outline: none;
+  box-sizing: border-box;
 }
 
-.input-group input::placeholder {
-  color: gray;
-}
-
-.result-card {
-  margin-top: 30px;
-  background: rgba(255, 255, 255, 0.15);
-  padding: 25px;
-  border-radius: 15px;
-}
-
-.result-card h2 {
-  margin-bottom: 15px;
-}
-
-.result-card p {
-  margin: 12px 0;
-  font-size: 18px;
-}
 .details-card {
-  margin-top: 25px;
-  background: rgba(255, 255, 255, 0.18);
-  padding: 20px;
-  border-radius: 15px;
+  margin-top: 30px;
+  background: rgba(255,255,255,0.15);
+  padding: 25px;
+  border-radius: 20px;
 }
 
 .details-card h2 {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  font-size: 34px;
 }
 
 .details-card p {
-  margin: 10px 0;
+  margin: 15px 0;
+  font-size: 24px;
+}
+
+.map-button {
+  margin-top: 20px;
+  padding: 15px 25px;
+  border: none;
+  border-radius: 12px;
+  background: #00c853;
+  color: white;
   font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.map-button:hover {
+  background: #00b248;
+  transform: scale(1.03);
+}
+
+@media screen and (max-width: 768px) {
+
+  .glass-card {
+    padding: 25px;
+  }
+
+  .title {
+    font-size: 34px;
+  }
+
+  .subtitle {
+    font-size: 16px;
+  }
+
+  .input-group label {
+    font-size: 20px;
+  }
+
+  .input-group select,
+  .input-group input {
+    font-size: 18px;
+    padding: 14px;
+  }
+
+  .details-card h2 {
+    font-size: 28px;
+  }
+
+  .details-card p {
+    font-size: 20px;
+  }
+
 }

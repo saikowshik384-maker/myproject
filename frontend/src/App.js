@@ -16,8 +16,6 @@ function App() {
   const [selectedSubdistrict, setSelectedSubdistrict] = useState("");
   const [selectedVillage, setSelectedVillage] = useState("");
 
-  // SEARCH STATE
-
   const [search, setSearch] = useState("");
 
   // LOAD EXCEL FILE
@@ -363,6 +361,17 @@ function App() {
             <p>
               <strong>Village:</strong> {selectedVillage}
             </p>
+
+            <button
+              className="map-button"
+              onClick={() =>
+                window.open(
+                  `https://www.google.com/maps/search/${selectedVillage}`
+                )
+              }
+            >
+              🌍 View on Google Maps
+            </button>
 
           </div>
 
