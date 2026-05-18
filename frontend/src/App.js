@@ -1,79 +1,178 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
 
-  const [search, setSearch] = useState("");
-  const [villages, setVillages] = useState([]);
+  const [states, setStates] = useState([]);
+
+  const [districts, setDistricts] = useState([]);
+
+  const [subdistricts, setSubdistricts] = useState([]);
+
+  const [selectedState, setSelectedState] = useState("");
+
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+
+  const [selectedSubdistrict, setSelectedSubdistrict] = useState("");
 
   useEffect(() => {
-    fetchVillages();
+    fetchStates();
   }, []);
 
-  const fetchVillages = async () => {
+  useEffect(() => {
+
+    if (selectedState) {
+      fetchDistricts(selectedState);
+    }
+
+  }, [selectedState]);
+
+  useEffect(() => {
+
+    if (selectedDistrict) {
+      fetchSubdistricts(selectedDistrict);
+    }
+
+  }, [selectedDistrict]);
+
+  const fetchStates = async () => {
 
     const response = await fetch(
-      "http://localhost:3000/villages"
+      "http://localhost:3000/states"
     );
 
     const data = await response.json();
 
-    setVillages(data);
+    setStates(data);
   };
 
-  const searchVillages = async () => {
+  const fetchDistricts = async (state) => {
 
     const response = await fetch(
-      `http://localhost:3000/villages?name=${search}`
+      `http://localhost:3000/districts?state=${state}`
     );
 
     const data = await response.json();
 
-    setVillages(data);
+    setDistricts(data);
+  };
+
+  const fetchSubdistricts = async (district) => {
+
+    const response = await fetch(
+      `http://localhost:3000/subdistricts?district=${district}`
+    );
+
+    const data = await response.json();
+
+    setSubdistricts(data);
   };
 
   return (
+
     <div style={{ padding: "20px" }}>
 
-      <h1>Village Search</h1>
+      <h1>Village Search System</h1>
 
-      <input
-        type="text"
-        placeholder="Enter village name"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
+      <br />
+
+      <select
+        value={selectedState}
+        onChange={(e) => setSelectedState(e.target.value)}
         style={{
           padding: "10px",
-          width: "300px",
-          marginRight: "10px"
+          width: "300px"
         }}
-      />
+      >
 
-      <button onClick={searchVillages}>
-        Search
-      </button>
+        <option value="">
+          Select State
+        </option>
 
-      <div style={{ marginTop: "20px" }}>
+        {states.map((state, index) => (
 
-        {villages.map((village, index) => (
-          <div
+          <option
             key={index}
-            style={{
-              border: "1px solid gray",
-              padding: "10px",
-              marginBottom: "10px"
-            }}
+            value={state.state_name}
           >
-            <h3>{village.village_name}</h3>
+            {state.state_name}
+          </option>
 
-            <p>State: {village.state_name}</p>
-
-            <p>District: {village.district_name}</p>
-
-            <p>Subdistrict: {village.subdistrict_name}</p>
-          </div>
         ))}
 
-      </div>
+      </select>
+
+      <br />
+      <br />
+
+      <select
+        value={selectedDistrict}
+        onChange={(e) => setSelectedDistrict(e.target.value)}
+        style={{
+          padding: "10px",
+          width: "300px"
+        }}
+      >
+
+        <option value="">
+          Select District
+        </option>
+
+        {districts.map((district, index) => (
+
+          <option
+            key={index}
+            value={district.district_name}
+          >
+            {district.district_name}
+          </option>
+
+        ))}
+
+      </select>
+
+      <br />
+      <br />
+
+      <select
+        value={selectedSubdistrict}
+        onChange={(e) => setSelectedSubdistrict(e.target.value)}
+        style={{
+          padding: "10px",
+          width: "300px"
+        }}
+      >
+
+        <option value="">
+          Select Subdistrict
+        </option>
+
+        {subdistricts.map((subdistrict, index) => (
+
+          <option
+            key={index}
+            value={subdistrict.subdistrict_name}
+          >
+            {subdistrict.subdistrict_name}
+          </option>
+
+        ))}
+
+      </select>
+
+      <br />
+      <br />
+
+      <h3>
+        Selected State: {selectedState}
+      </h3>
+
+      <h3>
+        Selected District: {selectedDistrict}
+      </h3>
+
+      <h3>
+        Selected Subdistrict: {selectedSubdistrict}
+      </h3>
 
     </div>
   );
