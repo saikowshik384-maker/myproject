@@ -2,6 +2,16 @@ import "./App.css";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from "recharts";
+
 function App() {
 
   const [data, setData] = useState([]);
@@ -158,6 +168,18 @@ function App() {
   const filteredVillages = villages.filter((village) =>
     village.toLowerCase().includes(search.toLowerCase())
   );
+
+  // CHART DATA
+
+  const chartData = filteredVillages
+    .slice(0, 10)
+    .map((village, index) => ({
+      name: village,
+      population:
+        Math.floor(
+          Math.random() * 100000
+        ) + 1000
+    }));
 
   return (
 
@@ -354,6 +376,42 @@ function App() {
               ))}
 
             </select>
+
+          </div>
+
+        )}
+
+        {/* CHART */}
+
+        {filteredVillages.length > 0 && (
+
+          <div className="chart-card">
+
+            <h2>📊 Village Population Chart</h2>
+
+            <ResponsiveContainer
+              width="100%"
+              height={350}
+            >
+
+              <BarChart data={chartData}>
+
+                <CartesianGrid strokeDasharray="3 3" />
+
+                <XAxis dataKey="name" />
+
+                <YAxis />
+
+                <Tooltip />
+
+                <Bar
+                  dataKey="population"
+                  fill="#00c853"
+                />
+
+              </BarChart>
+
+            </ResponsiveContainer>
 
           </div>
 

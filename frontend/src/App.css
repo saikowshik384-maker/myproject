@@ -29,7 +29,7 @@ body {
 
 .glass-card {
   width: 100%;
-  max-width: 700px;
+  max-width: 900px;
   background: rgba(255, 255, 255, 0.15);
   border-radius: 25px;
   padding: 40px;
@@ -92,6 +92,18 @@ body {
   font-size: 20px;
   outline: none;
   box-sizing: border-box;
+}
+
+.chart-card {
+  margin-top: 30px;
+  background: rgba(255,255,255,0.15);
+  padding: 25px;
+  border-radius: 20px;
+}
+
+.chart-card h2 {
+  margin-bottom: 20px;
+  font-size: 30px;
 }
 
 .details-card {
@@ -159,7 +171,8 @@ body {
     padding: 14px;
   }
 
-  .details-card h2 {
+  .details-card h2,
+  .chart-card h2 {
     font-size: 28px;
   }
 
