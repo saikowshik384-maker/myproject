@@ -86,27 +86,26 @@ function App() {
 
         .then((data) => {
 
-          console.log(
-            "DISTRICT WEATHER:",
-            data
-          );
+          console.log(data);
 
-          if (data.cod === 200) {
+          // IMPORTANT FIX
+
+          if (data.cod == 200) {
 
             setTemperature(
-              data.main.temp
+              data.main?.temp || 0
             );
 
             setWeather(
-              data.weather[0].main
+              data.weather?.[0]?.main || "N/A"
             );
 
             setHumidity(
-              data.main.humidity
+              data.main?.humidity || 0
             );
 
             setWindSpeed(
-              data.wind.speed
+              data.wind?.speed || 0
             );
 
             setSunrise(
@@ -130,10 +129,28 @@ function App() {
               .then((aqiData) => {
 
                 setAqi(
-                  aqiData.list[0].main.aqi
+                  aqiData.list?.[0]?.main?.aqi || 1
                 );
 
               });
+
+          } else {
+
+            console.log(
+              "Weather not found"
+            );
+
+            setTemperature(null);
+
+            setWeather("Unavailable");
+
+            setHumidity("");
+
+            setWindSpeed("");
+
+            setSunrise("");
+
+            setAqi("");
 
           }
 
@@ -478,7 +495,7 @@ function App() {
 
                 🌡️ {
 
-                  temperature
+                  temperature !== null
                     ? `${Math.round(temperature)}°C`
                     : "Loading..."
 
@@ -505,7 +522,7 @@ function App() {
                 {" "}
 
                 {
-                  humidity
+                  humidity !== ""
                     ? `${humidity}%`
                     : "Loading..."
                 }
@@ -518,7 +535,7 @@ function App() {
                 {" "}
 
                 {
-                  windSpeed
+                  windSpeed !== ""
                     ? `${windSpeed} m/s`
                     : "Loading..."
                 }
@@ -543,8 +560,9 @@ function App() {
                 {" "}
 
                 {
-                  aqi ||
-                  "Loading..."
+                  aqi !== ""
+                    ? aqi
+                    : "Loading..."
                 }
 
               </p>
