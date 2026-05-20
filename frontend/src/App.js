@@ -1,16 +1,10 @@
 import "./App.css";
-import { useEffect, useState } from "react";
-import * as XLSX from "xlsx";
 
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer
-} from "recharts";
+import { useEffect, useState } from "react";
+
+import Papa from "papaparse";
+
+import Select from "react-select";
 
 function App() {
 
@@ -21,62 +15,194 @@ function App() {
   const [subdistricts, setSubdistricts] = useState([]);
   const [villages, setVillages] = useState([]);
 
-  const [selectedState, setSelectedState] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedSubdistrict, setSelectedSubdistrict] = useState("");
-  const [selectedVillage, setSelectedVillage] = useState("");
+  const [selectedState, setSelectedState] = useState(null);
+  const [selectedDistrict, setSelectedDistrict] = useState(null);
+  const [selectedSubdistrict, setSelectedSubdistrict] = useState(null);
+  const [selectedVillage, setSelectedVillage] = useState(null);
 
-  const [search, setSearch] = useState("");
+  // WEATHER STATES
 
-  // DARK MODE
+  const [temperature, setTemperature] = useState(null);
+  const [weather, setWeather] = useState("");
 
-  const [darkMode, setDarkMode] = useState(true);
+  const [humidity, setHumidity] = useState("");
+  const [windSpeed, setWindSpeed] = useState("");
+  const [sunrise, setSunrise] = useState("");
+  const [aqi, setAqi] = useState("");
 
-  // LOAD EXCEL FILE
+  // LOCATION
+
+  const [currentLocation, setCurrentLocation] = useState("");
+
+  // GET USER LOCATION
 
   useEffect(() => {
 
-    fetch("/villages.xlsx")
-      .then((res) => res.arrayBuffer())
-      .then((buffer) => {
+    navigator.geolocation.getCurrentPosition(
 
-        const workbook = XLSX.read(buffer, {
-          type: "buffer"
+      (position) => {
+
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        setCurrentLocation(
+          `${lat}, ${lon}`
+        );
+
+      },
+
+      (error) => {
+
+        console.log(error);
+
+      }
+
+    );
+
+  }, []);
+
+  // WEATHER BASED ON DISTRICT
+
+  useEffect(() => {
+
+    if (
+      selectedDistrict &&
+      selectedState
+    ) {
+
+      const apiKey =
+        "3dfe78b2ced29f23886759283c1a77d0";
+
+      const city =
+        selectedDistrict.label;
+
+      fetch(
+
+        `https://api.openweathermap.org/data/2.5/weather?q=${city},IN&appid=${apiKey}&units=metric`
+
+      )
+
+        .then((res) => res.json())
+
+        .then((data) => {
+
+          console.log(
+            "DISTRICT WEATHER:",
+            data
+          );
+
+          if (data.cod === 200) {
+
+            setTemperature(
+              data.main.temp
+            );
+
+            setWeather(
+              data.weather[0].main
+            );
+
+            setHumidity(
+              data.main.humidity
+            );
+
+            setWindSpeed(
+              data.wind.speed
+            );
+
+            setSunrise(
+
+              new Date(
+                data.sys.sunrise * 1000
+              ).toLocaleTimeString()
+
+            );
+
+            // AQI
+
+            fetch(
+
+              `https://api.openweathermap.org/data/2.5/air_pollution?lat=${data.coord.lat}&lon=${data.coord.lon}&appid=${apiKey}`
+
+            )
+
+              .then((res) => res.json())
+
+              .then((aqiData) => {
+
+                setAqi(
+                  aqiData.list[0].main.aqi
+                );
+
+              });
+
+          }
+
+        })
+
+        .catch((err) => {
+
+          console.log(err);
+
         });
 
-        const sheetName = workbook.SheetNames[0];
+    }
 
-        const sheet = workbook.Sheets[sheetName];
+  }, [selectedDistrict, selectedState]);
 
-        const jsonData = XLSX.utils.sheet_to_json(sheet);
+  // LOAD CSV
+
+  useEffect(() => {
+
+    Papa.parse("/villages.csv", {
+
+      download: true,
+      header: true,
+
+      complete: function(results) {
+
+        const jsonData = results.data;
 
         setData(jsonData);
 
         const uniqueStates = [
 
           ...new Set(
-            jsonData.map(
-              (item) => item["STATE NAME"]
-            )
+
+            jsonData
+              .map(
+                (item) =>
+                  item["STATE NAME"]
+              )
+              .filter(Boolean)
+
           )
 
-        ];
+        ].sort();
 
-        setStates(uniqueStates);
+        setStates(
 
-      });
+          uniqueStates.map((state) => ({
+            value: state,
+            label: state
+          }))
+
+        );
+
+      }
+
+    });
 
   }, []);
 
   // STATE CHANGE
 
-  const handleStateChange = (state) => {
+  const handleStateChange = (selected) => {
 
-    setSelectedState(state);
+    setSelectedState(selected);
 
-    setSelectedDistrict("");
-    setSelectedSubdistrict("");
-    setSelectedVillage("");
+    setSelectedDistrict(null);
+    setSelectedSubdistrict(null);
+    setSelectedVillage(null);
 
     const filteredDistricts = [
 
@@ -85,30 +211,40 @@ function App() {
         data
           .filter(
             (item) =>
-              item["STATE NAME"] === state
+              item["STATE NAME"] ===
+              selected.value
           )
           .map(
-            (item) => item["DISTRICT NAME"]
+            (item) =>
+              item["DISTRICT NAME"]
           )
+          .filter(Boolean)
 
       )
 
-    ];
+    ].sort();
 
-    setDistricts(filteredDistricts);
+    setDistricts(
 
-    setSubdistricts([]);
-    setVillages([]);
+      filteredDistricts.map(
+        (district) => ({
+          value: district,
+          label: district
+        })
+      )
+
+    );
+
   };
 
   // DISTRICT CHANGE
 
-  const handleDistrictChange = (district) => {
+  const handleDistrictChange = (selected) => {
 
-    setSelectedDistrict(district);
+    setSelectedDistrict(selected);
 
-    setSelectedSubdistrict("");
-    setSelectedVillage("");
+    setSelectedSubdistrict(null);
+    setSelectedVillage(null);
 
     const filteredSubdistricts = [
 
@@ -117,29 +253,41 @@ function App() {
         data
           .filter(
             (item) =>
-              item["STATE NAME"] === selectedState &&
-              item["DISTRICT NAME"] === district
+              item["STATE NAME"] ===
+                selectedState.value &&
+              item["DISTRICT NAME"] ===
+                selected.value
           )
           .map(
-            (item) => item["SUB-DISTRICT NAME"]
+            (item) =>
+              item["SUB-DISTRICT NAME"]
           )
+          .filter(Boolean)
 
       )
 
-    ];
+    ].sort();
 
-    setSubdistricts(filteredSubdistricts);
+    setSubdistricts(
 
-    setVillages([]);
+      filteredSubdistricts.map(
+        (subdistrict) => ({
+          value: subdistrict,
+          label: subdistrict
+        })
+      )
+
+    );
+
   };
 
   // SUBDISTRICT CHANGE
 
-  const handleSubdistrictChange = (subdistrict) => {
+  const handleSubdistrictChange = (selected) => {
 
-    setSelectedSubdistrict(subdistrict);
+    setSelectedSubdistrict(selected);
 
-    setSelectedVillage("");
+    setSelectedVillage(null);
 
     const filteredVillages = [
 
@@ -148,137 +296,89 @@ function App() {
         data
           .filter(
             (item) =>
-              item["STATE NAME"] === selectedState &&
-              item["DISTRICT NAME"] === selectedDistrict &&
-              item["SUB-DISTRICT NAME"] === subdistrict
+              item["STATE NAME"] ===
+                selectedState.value &&
+              item["DISTRICT NAME"] ===
+                selectedDistrict.value &&
+              item["SUB-DISTRICT NAME"] ===
+                selected.value
           )
           .map(
-            (item) => item["Area Name"]
+            (item) =>
+              item["Area Name"]
           )
+          .filter(Boolean)
 
       )
 
-    ];
+    ].sort();
 
-    setVillages(filteredVillages);
+    setVillages(
+
+      filteredVillages.map(
+        (village) => ({
+          value: village,
+          label: village
+        })
+      )
+
+    );
+
   };
-
-  // SEARCH FILTER
-
-  const filteredVillages = villages.filter((village) =>
-    village.toLowerCase().includes(search.toLowerCase())
-  );
-
-  // CHART DATA
-
-  const chartData = filteredVillages
-    .slice(0, 10)
-    .map((village, index) => ({
-      name: village,
-      population:
-        Math.floor(
-          Math.random() * 100000
-        ) + 1000
-    }));
 
   return (
 
-    <div className={darkMode ? "main-container dark" : "main-container light"}>
+    <div className="main-container">
 
       <div className="glass-card">
 
-        {/* THEME BUTTON */}
-
-        <div className="theme-toggle">
-
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="theme-button"
-          >
-
-            {darkMode
-              ? "☀️ Light Mode"
-              : "🌙 Dark Mode"}
-
-          </button>
-
-        </div>
-
         <h1 className="title">
-          🌍 Village Search System
+          🌍 Smart Tourism App
         </h1>
 
         <p className="subtitle">
-          Real Excel Dataset Integration 🚀
+          Premium India Village Finder 🇮🇳
         </p>
 
         {/* STATE */}
 
         <div className="input-group">
 
-          <label>Select State</label>
+          <label>
+            Select State
+          </label>
 
-          <select
+          <Select
+            options={states}
             value={selectedState}
-            onChange={(e) =>
-              handleStateChange(e.target.value)
+            onChange={
+              handleStateChange
             }
-          >
-
-            <option value="">
-              Choose State
-            </option>
-
-            {states.map((state, index) => (
-
-              <option
-                key={index}
-                value={state}
-              >
-
-                {state}
-
-              </option>
-
-            ))}
-
-          </select>
+            placeholder="Search State..."
+            isSearchable
+          />
 
         </div>
 
         {/* DISTRICT */}
 
-        {selectedState && (
+        {districts.length > 0 && (
 
           <div className="input-group">
 
-            <label>Select District</label>
+            <label>
+              Select District
+            </label>
 
-            <select
+            <Select
+              options={districts}
               value={selectedDistrict}
-              onChange={(e) =>
-                handleDistrictChange(e.target.value)
+              onChange={
+                handleDistrictChange
               }
-            >
-
-              <option value="">
-                Choose District
-              </option>
-
-              {districts.map((district, index) => (
-
-                <option
-                  key={index}
-                  value={district}
-                >
-
-                  {district}
-
-                </option>
-
-              ))}
-
-            </select>
+              placeholder="Search District..."
+              isSearchable
+            />
 
           </div>
 
@@ -286,57 +386,22 @@ function App() {
 
         {/* SUBDISTRICT */}
 
-        {selectedDistrict && (
+        {subdistricts.length > 0 && (
 
           <div className="input-group">
 
-            <label>Select Sub-District</label>
+            <label>
+              Select Sub-District
+            </label>
 
-            <select
+            <Select
+              options={subdistricts}
               value={selectedSubdistrict}
-              onChange={(e) =>
-                handleSubdistrictChange(e.target.value)
+              onChange={
+                handleSubdistrictChange
               }
-            >
-
-              <option value="">
-                Choose Sub-District
-              </option>
-
-              {subdistricts.map((subdistrict, index) => (
-
-                <option
-                  key={index}
-                  value={subdistrict}
-                >
-
-                  {subdistrict}
-
-                </option>
-
-              ))}
-
-            </select>
-
-          </div>
-
-        )}
-
-        {/* SEARCH */}
-
-        {selectedSubdistrict && (
-
-          <div className="input-group">
-
-            <label>Search Village</label>
-
-            <input
-              type="text"
-              placeholder="Type village name..."
-              value={search}
-              onChange={(e) =>
-                setSearch(e.target.value)
-              }
+              placeholder="Search Sub-District..."
+              isSearchable
             />
 
           </div>
@@ -345,73 +410,23 @@ function App() {
 
         {/* VILLAGE */}
 
-        {selectedSubdistrict && (
+        {villages.length > 0 && (
 
           <div className="input-group">
 
-            <label>Select Village</label>
+            <label>
+              Select Village
+            </label>
 
-            <select
+            <Select
+              options={villages}
               value={selectedVillage}
-              onChange={(e) =>
-                setSelectedVillage(e.target.value)
+              onChange={
+                setSelectedVillage
               }
-            >
-
-              <option value="">
-                Choose Village
-              </option>
-
-              {filteredVillages.map((village, index) => (
-
-                <option
-                  key={index}
-                  value={village}
-                >
-
-                  {village}
-
-                </option>
-
-              ))}
-
-            </select>
-
-          </div>
-
-        )}
-
-        {/* CHART */}
-
-        {filteredVillages.length > 0 && (
-
-          <div className="chart-card">
-
-            <h2>📊 Village Population Chart</h2>
-
-            <ResponsiveContainer
-              width="100%"
-              height={350}
-            >
-
-              <BarChart data={chartData}>
-
-                <CartesianGrid strokeDasharray="3 3" />
-
-                <XAxis dataKey="name" />
-
-                <YAxis />
-
-                <Tooltip />
-
-                <Bar
-                  dataKey="population"
-                  fill="#00c853"
-                />
-
-              </BarChart>
-
-            </ResponsiveContainer>
+              placeholder="Search Village..."
+              isSearchable
+            />
 
           </div>
 
@@ -423,51 +438,263 @@ function App() {
 
           <div className="details-card">
 
-            <h2>Village Information</h2>
+            <h2>
+              📍 Village Details
+            </h2>
 
             <p>
-              <strong>State:</strong> {selectedState}
+              <strong>State:</strong>
+              {" "}
+              {selectedState.label}
             </p>
 
             <p>
-              <strong>District:</strong> {selectedDistrict}
+              <strong>District:</strong>
+              {" "}
+              {selectedDistrict.label}
             </p>
 
             <p>
-              <strong>Sub-District:</strong> {selectedSubdistrict}
+              <strong>Sub-District:</strong>
+              {" "}
+              {selectedSubdistrict.label}
             </p>
 
             <p>
-              <strong>Village:</strong> {selectedVillage}
+              <strong>Village:</strong>
+              {" "}
+              {selectedVillage.label}
             </p>
 
-            <button
-              className="map-button"
-              onClick={() =>
-                window.open(
-                  `https://www.google.com/maps/search/${selectedVillage}`
-                )
-              }
-            >
-              🌍 View on Google Maps
-            </button>
+            {/* WEATHER */}
 
-            {/* LIVE MAP */}
+            <div className="weather-card">
 
-            <div className="map-container">
+              <h3>
+                🌦️ Live Weather
+              </h3>
+
+              <h2 className="temperature">
+
+                🌡️ {
+
+                  temperature
+                    ? `${Math.round(temperature)}°C`
+                    : "Loading..."
+
+                }
+
+              </h2>
+
+              <p>
+
+                Current Weather:
+                <strong>
+                  {" "}
+                  {
+                    weather ||
+                    "Loading..."
+                  }
+                </strong>
+
+              </p>
+
+              <p>
+
+                💧 Humidity:
+                {" "}
+
+                {
+                  humidity
+                    ? `${humidity}%`
+                    : "Loading..."
+                }
+
+              </p>
+
+              <p>
+
+                💨 Wind Speed:
+                {" "}
+
+                {
+                  windSpeed
+                    ? `${windSpeed} m/s`
+                    : "Loading..."
+                }
+
+              </p>
+
+              <p>
+
+                🌅 Sunrise:
+                {" "}
+
+                {
+                  sunrise ||
+                  "Loading..."
+                }
+
+              </p>
+
+              <p>
+
+                🌫️ AQI Index:
+                {" "}
+
+                {
+                  aqi ||
+                  "Loading..."
+                }
+
+              </p>
+
+              <p>
+
+                📍 Current Location:
+                {" "}
+
+                {
+                  currentLocation
+                }
+
+              </p>
+
+            </div>
+
+            {/* BUS */}
+
+            <div className="service-card">
+
+              <h3>
+                🚌 Bus Timings
+              </h3>
+
+              <ul>
+
+                <li>
+                  APSRTC → 6:30 AM
+                </li>
+
+                <li>
+                  APSRTC → 9:15 AM
+                </li>
+
+                <li>
+                  APSRTC → 1:45 PM
+                </li>
+
+                <li>
+                  APSRTC → 6:00 PM
+                </li>
+
+              </ul>
+
+            </div>
+
+            {/* CAB */}
+
+            <div className="service-card">
+
+              <h3>
+                🚕 Uber / Rapido
+              </h3>
+
+              <p>
+
+                Uber:
+
+                {
+
+                  selectedDistrict?.label === "Hyderabad" ||
+                  selectedDistrict?.label === "Bengaluru" ||
+                  selectedDistrict?.label === "Chennai" ||
+                  selectedDistrict?.label === "Mumbai" ||
+                  selectedDistrict?.label === "Delhi"
+
+                    ? " ✅ Available"
+
+                    : " ❌ Not Available"
+
+                }
+
+              </p>
+
+              <p>
+
+                Rapido:
+
+                {
+
+                  selectedDistrict?.label === "Hyderabad" ||
+                  selectedDistrict?.label === "Bengaluru" ||
+                  selectedDistrict?.label === "Chennai" ||
+                  selectedDistrict?.label === "Mumbai" ||
+                  selectedDistrict?.label === "Delhi"
+
+                    ? " ✅ Available"
+
+                    : " ❌ Not Available"
+
+                }
+
+              </p>
+
+            </div>
+
+            {/* WIFI */}
+
+            <div className="service-card">
+
+              <h3>
+                📶 Public WiFi
+              </h3>
+
+              <ul>
+
+                <li>
+                  Railway Station WiFi
+                </li>
+
+                <li>
+                  Bus Stand Free WiFi
+                </li>
+
+                <li>
+                  Government Office WiFi
+                </li>
+
+              </ul>
+
+            </div>
+
+            {/* MAP */}
+
+            <div className="map-card">
+
+              <h3>
+                🗺️ Village Map
+              </h3>
 
               <iframe
-                title="Village Map"
+
+                title="map"
+
                 width="100%"
-                height="350"
+
+                height="400"
+
                 style={{
                   border: 0,
-                  borderRadius: "15px",
-                  marginTop: "20px"
+                  borderRadius: "20px"
                 }}
+
                 loading="lazy"
+
                 allowFullScreen
-                src={`https://www.google.com/maps?q=${selectedVillage}&output=embed`}
+
+                src={`https://maps.google.com/maps?q=${selectedVillage.label}&t=k&z=13&ie=UTF8&iwloc=&output=embed`}
+
               ></iframe>
 
             </div>

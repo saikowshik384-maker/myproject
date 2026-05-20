@@ -1,183 +1,165 @@
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-.dark {
-  background: linear-gradient(
-    135deg,
-    #1e3c72,
-    #2a5298
-  );
-}
-
-.light {
-  background: linear-gradient(
-    135deg,
-    #f5f7fa,
-    #c3cfe2
-  );
+  font-family: "Poppins", sans-serif;
+  background: #0f172a;
 }
 
 .main-container {
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
+  padding: 40px;
+  background:
+    linear-gradient(
+      135deg,
+      #0f172a,
+      #1e293b,
+      #111827
+    );
 }
 
 .glass-card {
-  width: 100%;
-  max-width: 900px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 25px;
+  max-width: 1000px;
+  margin: auto;
   padding: 40px;
-  backdrop-filter: blur(12px);
-  box-shadow: 0px 8px 30px rgba(0,0,0,0.3);
-  color: white;
+  border-radius: 30px;
+  background:
+    rgba(255,255,255,0.08);
+  backdrop-filter: blur(20px);
 }
 
 .title {
   text-align: center;
-  font-size: 52px;
-  margin-bottom: 10px;
+  color: white;
+  font-size: 54px;
 }
 
 .subtitle {
   text-align: center;
-  margin-bottom: 40px;
-  font-size: 20px;
-}
-
-.theme-toggle {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 20px;
-}
-
-.theme-button {
-  padding: 12px 18px;
-  border: none;
-  border-radius: 12px;
-  background: white;
-  color: #333;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.theme-button:hover {
-  transform: scale(1.05);
+  color: #cbd5e1;
+  margin-bottom: 30px;
 }
 
 .input-group {
-  margin-bottom: 30px;
+  margin-bottom: 24px;
 }
 
 .input-group label {
   display: block;
-  margin-bottom: 10px;
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.input-group select,
-.input-group input {
-  width: 100%;
-  padding: 18px;
-  border-radius: 15px;
-  border: none;
+  margin-bottom: 12px;
+  color: white;
   font-size: 20px;
-  outline: none;
-  box-sizing: border-box;
-}
-
-.chart-card {
-  margin-top: 30px;
-  background: rgba(255,255,255,0.15);
-  padding: 25px;
-  border-radius: 20px;
-}
-
-.chart-card h2 {
-  margin-bottom: 20px;
-  font-size: 30px;
 }
 
 .details-card {
   margin-top: 30px;
-  background: rgba(255,255,255,0.15);
-  padding: 25px;
-  border-radius: 20px;
+  padding: 30px;
+  border-radius: 25px;
+  background:
+    rgba(255,255,255,0.08);
 }
 
 .details-card h2 {
-  margin-bottom: 20px;
-  font-size: 34px;
+  color: white;
+  font-size: 36px;
 }
 
 .details-card p {
-  margin: 15px 0;
-  font-size: 24px;
+  color: #e2e8f0;
+  font-size: 18px;
+  margin: 10px 0;
 }
 
-.map-button {
-  margin-top: 20px;
-  padding: 15px 25px;
-  border: none;
-  border-radius: 12px;
-  background: #00c853;
+.weather-card {
+  margin-top: 25px;
+  padding: 25px;
+  border-radius: 20px;
+  background:
+    rgba(255,255,255,0.08);
+}
+
+.weather-card h3 {
   color: white;
+  font-size: 28px;
+}
+
+.temperature {
+  font-size: 46px;
+  color: #38bdf8;
+}
+
+.voice-btn {
+
+  width: 100%;
+  padding: 18px;
+
+  margin-top: 18px;
+
+  border: none;
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      135deg,
+      crimson,
+      #ef4444
+    );
+
+  color: white;
+
   font-size: 18px;
   font-weight: bold;
+
   cursor: pointer;
-  transition: 0.3s;
 }
 
-.map-button:hover {
-  background: #00b248;
-  transform: scale(1.03);
+.voice-text {
+
+  color: white;
+  text-align: center;
+  margin-top: 15px;
 }
 
-.map-container {
-  margin-top: 25px;
-  overflow: hidden;
-  border-radius: 20px;
+.css-13cymwt-control,
+.css-t3ipsp-control {
+
+  background:
+    rgba(255,255,255,0.08) !important;
+
+  border-radius: 18px !important;
+
+  min-height: 60px !important;
+
+  border:
+    1px solid rgba(255,255,255,0.1) !important;
 }
 
-@media screen and (max-width: 768px) {
+.css-1nmdiq5-menu {
 
-  .glass-card {
-    padding: 25px;
-  }
+  background: #000 !important;
+}
 
-  .title {
-    font-size: 34px;
-  }
+.css-10wo9uf-option {
 
-  .subtitle {
-    font-size: 16px;
-  }
+  background: #000 !important;
+  color: white !important;
+}
 
-  .input-group label {
-    font-size: 20px;
-  }
+.css-tr4s17-option {
 
-  .input-group select,
-  .input-group input {
-    font-size: 18px;
-    padding: 14px;
-  }
+  background: #2563eb !important;
+  color: white !important;
+}
+.css-singleValue {
+  color: white !important;
+}
 
-  .details-card h2,
-  .chart-card h2 {
-    font-size: 28px;
-  }
+.css-1dimb5e-singleValue {
+  color: white !important;
+}
 
-  .details-card p {
-    font-size: 20px;
-  }
+.css-qbdosj-Input input {
+  color: white !important;
+}
 
+.css-19bb58m input {
+  color: white !important;
 }
