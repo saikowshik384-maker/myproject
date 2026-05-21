@@ -1,12 +1,13 @@
 import "./App.css";
-
 import { useEffect, useState } from "react";
-
 import Papa from "papaparse";
-
 import Select from "react-select";
 
 function App() {
+
+  // ================================
+  // DATA STATES
+  // ================================
 
   const [data, setData] = useState([]);
 
@@ -15,45 +16,148 @@ function App() {
   const [subdistricts, setSubdistricts] = useState([]);
   const [villages, setVillages] = useState([]);
 
-  const [selectedState, setSelectedState] = useState(null);
-  const [selectedDistrict, setSelectedDistrict] = useState(null);
-  const [selectedSubdistrict, setSelectedSubdistrict] = useState(null);
-  const [selectedVillage, setSelectedVillage] = useState(null);
+  // ================================
+  // SELECTED VALUES
+  // ================================
 
+  const [selectedState, setSelectedState] =
+    useState(null);
+
+  const [selectedDistrict, setSelectedDistrict] =
+    useState(null);
+
+  const [selectedSubdistrict, setSelectedSubdistrict] =
+    useState(null);
+
+  const [selectedVillage, setSelectedVillage] =
+    useState(null);
+
+  // ================================
   // WEATHER STATES
+  // ================================
 
-  const [temperature, setTemperature] = useState(null);
-  const [weather, setWeather] = useState("");
+  const [temperature, setTemperature] =
+    useState(null);
 
-  const [humidity, setHumidity] = useState("");
-  const [windSpeed, setWindSpeed] = useState("");
-  const [sunrise, setSunrise] = useState("");
-  const [aqi, setAqi] = useState("");
+  const [weather, setWeather] =
+    useState("");
 
+  const [humidity, setHumidity] =
+    useState("");
+
+  const [windSpeed, setWindSpeed] =
+    useState("");
+
+  const [sunrise, setSunrise] =
+    useState("");
+
+  const [aqi, setAqi] =
+    useState("");
+
+  const [weatherError, setWeatherError] =
+    useState("");
+
+  // ================================
   // LOCATION
+  // ================================
 
-  const [currentLocation, setCurrentLocation] = useState("");
+  const [currentLocation, setCurrentLocation] =
+    useState("");
 
-  // GET USER LOCATION
+  // ================================
+  // GET LIVE WEATHER USING GPS
+  // ================================
 
   useEffect(() => {
 
     navigator.geolocation.getCurrentPosition(
 
-      (position) => {
+      async (position) => {
 
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
+        const lat =
+          position.coords.latitude;
+
+        const lon =
+          position.coords.longitude;
 
         setCurrentLocation(
           `${lat}, ${lon}`
         );
 
+        const apiKey =
+          "3dfe78b2ced29f23886759283c1a77d0";
+
+        try {
+
+          // WEATHER API
+
+          const weatherResponse =
+            await fetch(
+
+              `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
+
+            );
+
+          const weatherData =
+            await weatherResponse.json();
+
+          setTemperature(
+            weatherData.main.temp
+          );
+
+          setWeather(
+            weatherData.weather[0].main
+          );
+
+          setHumidity(
+            weatherData.main.humidity
+          );
+
+          setWindSpeed(
+            weatherData.wind.speed
+          );
+
+          setSunrise(
+
+            new Date(
+              weatherData.sys.sunrise * 1000
+            ).toLocaleTimeString()
+
+          );
+
+          // AQI API
+
+          const aqiResponse =
+            await fetch(
+
+              `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`
+
+            );
+
+          const aqiData =
+            await aqiResponse.json();
+
+          setAqi(
+            aqiData.list[0].main.aqi
+          );
+
+        } catch (error) {
+
+          console.log(error);
+
+          setWeatherError(
+            "Unable to fetch weather"
+          );
+
+        }
+
       },
 
-      (error) => {
+      () => {
 
-        console.log(error);
+        setWeatherError(
+          "Location permission denied"
+        );
 
       }
 
@@ -61,112 +165,9 @@ function App() {
 
   }, []);
 
-  // WEATHER BASED ON DISTRICT
-
-  useEffect(() => {
-
-    if (
-      selectedDistrict &&
-      selectedState
-    ) {
-
-      const apiKey =
-        "3dfe78b2ced29f23886759283c1a77d0";
-
-      const city =
-        selectedDistrict.label;
-
-      fetch(
-
-        `https://api.openweathermap.org/data/2.5/weather?q=${city},IN&appid=${apiKey}&units=metric`
-
-      )
-
-        .then((res) => res.json())
-
-        .then((data) => {
-
-          console.log(data);
-
-          // IMPORTANT FIX
-
-          if (data.cod == 200) {
-
-            setTemperature(
-              data.main?.temp || 0
-            );
-
-            setWeather(
-              data.weather?.[0]?.main || "N/A"
-            );
-
-            setHumidity(
-              data.main?.humidity || 0
-            );
-
-            setWindSpeed(
-              data.wind?.speed || 0
-            );
-
-            setSunrise(
-
-              new Date(
-                data.sys.sunrise * 1000
-              ).toLocaleTimeString()
-
-            );
-
-            // AQI
-
-            fetch(
-
-              `https://api.openweathermap.org/data/2.5/air_pollution?lat=${data.coord.lat}&lon=${data.coord.lon}&appid=${apiKey}`
-
-            )
-
-              .then((res) => res.json())
-
-              .then((aqiData) => {
-
-                setAqi(
-                  aqiData.list?.[0]?.main?.aqi || 1
-                );
-
-              });
-
-          } else {
-
-            console.log(
-              "Weather not found"
-            );
-
-            setTemperature(null);
-
-            setWeather("Unavailable");
-
-            setHumidity("");
-
-            setWindSpeed("");
-
-            setSunrise("");
-
-            setAqi("");
-
-          }
-
-        })
-
-        .catch((err) => {
-
-          console.log(err);
-
-        });
-
-    }
-
-  }, [selectedDistrict, selectedState]);
-
+  // ================================
   // LOAD CSV
+  // ================================
 
   useEffect(() => {
 
@@ -177,7 +178,8 @@ function App() {
 
       complete: function(results) {
 
-        const jsonData = results.data;
+        const jsonData =
+          results.data;
 
         setData(jsonData);
 
@@ -194,7 +196,7 @@ function App() {
 
           )
 
-        ].sort();
+        ];
 
         setStates(
 
@@ -211,7 +213,9 @@ function App() {
 
   }, []);
 
+  // ================================
   // STATE CHANGE
+  // ================================
 
   const handleStateChange = (selected) => {
 
@@ -235,11 +239,10 @@ function App() {
             (item) =>
               item["DISTRICT NAME"]
           )
-          .filter(Boolean)
 
       )
 
-    ].sort();
+    ];
 
     setDistricts(
 
@@ -254,7 +257,9 @@ function App() {
 
   };
 
+  // ================================
   // DISTRICT CHANGE
+  // ================================
 
   const handleDistrictChange = (selected) => {
 
@@ -279,11 +284,10 @@ function App() {
             (item) =>
               item["SUB-DISTRICT NAME"]
           )
-          .filter(Boolean)
 
       )
 
-    ].sort();
+    ];
 
     setSubdistricts(
 
@@ -298,13 +302,13 @@ function App() {
 
   };
 
+  // ================================
   // SUBDISTRICT CHANGE
+  // ================================
 
   const handleSubdistrictChange = (selected) => {
 
     setSelectedSubdistrict(selected);
-
-    setSelectedVillage(null);
 
     const filteredVillages = [
 
@@ -324,11 +328,10 @@ function App() {
             (item) =>
               item["Area Name"]
           )
-          .filter(Boolean)
 
       )
 
-    ].sort();
+    ];
 
     setVillages(
 
@@ -349,13 +352,39 @@ function App() {
 
       <div className="glass-card">
 
+        {/* TITLE */}
+
         <h1 className="title">
-          🌍 Smart Tourism App
+
+          🇮🇳 Bharat Tourism AI
+
         </h1>
 
         <p className="subtitle">
-          Premium India Village Finder 🇮🇳
+
+          Smart Village Discovery & Travel Assistant
+
         </p>
+
+        <div className="top-badges">
+
+          <span>
+            🌦️ Live Weather
+          </span>
+
+          <span>
+            🗺️ Satellite Maps
+          </span>
+
+          <span>
+            🚕 Transport
+          </span>
+
+          <span>
+            📶 Public WiFi
+          </span>
+
+        </div>
 
         {/* STATE */}
 
@@ -372,82 +401,90 @@ function App() {
               handleStateChange
             }
             placeholder="Search State..."
-            isSearchable
           />
 
         </div>
 
         {/* DISTRICT */}
 
-        {districts.length > 0 && (
+        {
 
-          <div className="input-group">
+          districts.length > 0 && (
 
-            <label>
-              Select District
-            </label>
+            <div className="input-group">
 
-            <Select
-              options={districts}
-              value={selectedDistrict}
-              onChange={
-                handleDistrictChange
-              }
-              placeholder="Search District..."
-              isSearchable
-            />
+              <label>
+                Select District
+              </label>
 
-          </div>
+              <Select
+                options={districts}
+                value={selectedDistrict}
+                onChange={
+                  handleDistrictChange
+                }
+                placeholder="Search District..."
+              />
 
-        )}
+            </div>
+
+          )
+
+        }
 
         {/* SUBDISTRICT */}
 
-        {subdistricts.length > 0 && (
+        {
 
-          <div className="input-group">
+          subdistricts.length > 0 && (
 
-            <label>
-              Select Sub-District
-            </label>
+            <div className="input-group">
 
-            <Select
-              options={subdistricts}
-              value={selectedSubdistrict}
-              onChange={
-                handleSubdistrictChange
-              }
-              placeholder="Search Sub-District..."
-              isSearchable
-            />
+              <label>
+                Select Sub-District
+              </label>
 
-          </div>
+              <Select
+                options={subdistricts}
+                value={selectedSubdistrict}
+                onChange={
+                  handleSubdistrictChange
+                }
+                placeholder="Search Sub-District..."
+              />
 
-        )}
+            </div>
+
+          )
+
+        }
 
         {/* VILLAGE */}
 
-        {villages.length > 0 && (
+        {
 
-          <div className="input-group">
+          villages.length > 0 && (
 
-            <label>
-              Select Village
-            </label>
+            <div className="input-group">
 
-            <Select
-              options={villages}
-              value={selectedVillage}
-              onChange={
-                setSelectedVillage
-              }
-              placeholder="Search Village..."
-              isSearchable
-            />
+              <label>
+                Select Village
+              </label>
 
-          </div>
+              <Select
+                options={villages}
+                value={selectedVillage}
+                onChange={
+                  setSelectedVillage
+                }
+                placeholder="Search Village..."
+              />
 
-        )}
+            </div>
+
+          )
+
+        }
 
         {/* DETAILS */}
 
@@ -455,33 +492,43 @@ function App() {
 
           <div className="details-card">
 
-            <h2>
-              📍 Village Details
-            </h2>
+            <div className="section-title">
 
-            <p>
-              <strong>State:</strong>
-              {" "}
-              {selectedState.label}
-            </p>
+              <h2>
+                📍 Village Details
+              </h2>
 
-            <p>
-              <strong>District:</strong>
-              {" "}
-              {selectedDistrict.label}
-            </p>
+              <span className="live-badge">
+                LIVE
+              </span>
 
-            <p>
-              <strong>Sub-District:</strong>
-              {" "}
-              {selectedSubdistrict.label}
-            </p>
+            </div>
 
-            <p>
-              <strong>Village:</strong>
-              {" "}
-              {selectedVillage.label}
-            </p>
+            {/* INFO */}
+
+            <div className="info-grid">
+
+              <div className="info-box">
+                <h4>State</h4>
+                <p>{selectedState.label}</p>
+              </div>
+
+              <div className="info-box">
+                <h4>District</h4>
+                <p>{selectedDistrict.label}</p>
+              </div>
+
+              <div className="info-box">
+                <h4>Sub-District</h4>
+                <p>{selectedSubdistrict.label}</p>
+              </div>
+
+              <div className="info-box">
+                <h4>Village</h4>
+                <p>{selectedVillage.label}</p>
+              </div>
+
+            </div>
 
             {/* WEATHER */}
 
@@ -491,9 +538,9 @@ function App() {
                 🌦️ Live Weather
               </h3>
 
-              <h2 className="temperature">
+              <h1 className="big-temp">
 
-                🌡️ {
+                {
 
                   temperature !== null
                     ? `${Math.round(temperature)}°C`
@@ -501,188 +548,252 @@ function App() {
 
                 }
 
-              </h2>
+              </h1>
 
-              <p>
-
-                Current Weather:
-                <strong>
-                  {" "}
-                  {
-                    weather ||
-                    "Loading..."
-                  }
-                </strong>
-
-              </p>
-
-              <p>
-
-                💧 Humidity:
-                {" "}
+              <p className="weather-text">
 
                 {
-                  humidity !== ""
-                    ? `${humidity}%`
-                    : "Loading..."
-                }
 
-              </p>
-
-              <p>
-
-                💨 Wind Speed:
-                {" "}
-
-                {
-                  windSpeed !== ""
-                    ? `${windSpeed} m/s`
-                    : "Loading..."
-                }
-
-              </p>
-
-              <p>
-
-                🌅 Sunrise:
-                {" "}
-
-                {
-                  sunrise ||
+                  weather ||
                   "Loading..."
+
                 }
 
               </p>
 
-              <p>
+              <div className="weather-grid">
 
-                🌫️ AQI Index:
-                {" "}
+                <div className="weather-box">
+                  💧 Humidity
+                  <span>{humidity}%</span>
+                </div>
 
-                {
-                  aqi !== ""
-                    ? aqi
-                    : "Loading..."
-                }
+                <div className="weather-box">
+                  💨 Wind
+                  <span>{windSpeed} m/s</span>
+                </div>
 
-              </p>
+                <div className="weather-box">
+                  🌅 Sunrise
+                  <span>{sunrise}</span>
+                </div>
 
-              <p>
+                <div className="weather-box">
+                  🌫️ AQI
+                  <span>{aqi}</span>
+                </div>
+
+              </div>
+
+              <div className="location-box">
 
                 📍 Current Location:
                 {" "}
+                {currentLocation}
 
-                {
-                  currentLocation
-                }
+              </div>
 
-              </p>
+              {
 
-            </div>
+                weatherError && (
 
-            {/* BUS */}
+                  <p className="error-text">
 
-            <div className="service-card">
+                    {weatherError}
 
-              <h3>
-                🚌 Bus Timings
-              </h3>
+                  </p>
 
-              <ul>
+                )
 
-                <li>
-                  APSRTC → 6:30 AM
-                </li>
-
-                <li>
-                  APSRTC → 9:15 AM
-                </li>
-
-                <li>
-                  APSRTC → 1:45 PM
-                </li>
-
-                <li>
-                  APSRTC → 6:00 PM
-                </li>
-
-              </ul>
+              }
 
             </div>
 
-            {/* CAB */}
+            {/* SERVICES */}
 
-            <div className="service-card">
+            <div className="services-grid">
 
-              <h3>
-                🚕 Uber / Rapido
-              </h3>
+              {/* BUS */}
 
-              <p>
+<div className="service-card">
 
-                Uber:
+  <h3>
+    🚌 Smart Bus Timings
+  </h3>
 
-                {
+  {
 
-                  selectedDistrict?.label === "Hyderabad" ||
-                  selectedDistrict?.label === "Bengaluru" ||
-                  selectedDistrict?.label === "Chennai" ||
-                  selectedDistrict?.label === "Mumbai" ||
-                  selectedDistrict?.label === "Delhi"
+    (() => {
 
-                    ? " ✅ Available"
+      const hour =
+        new Date().getHours();
 
-                    : " ❌ Not Available"
+      if (hour < 12) {
 
-                }
+        return (
 
-              </p>
+          <ul>
 
-              <p>
+            <li>
+              APSRTC → 6:30 AM
+            </li>
 
-                Rapido:
+            <li>
+              APSRTC → 8:15 AM
+            </li>
 
-                {
+            <li>
+              APSRTC → 10:00 AM
+            </li>
 
-                  selectedDistrict?.label === "Hyderabad" ||
-                  selectedDistrict?.label === "Bengaluru" ||
-                  selectedDistrict?.label === "Chennai" ||
-                  selectedDistrict?.label === "Mumbai" ||
-                  selectedDistrict?.label === "Delhi"
+          </ul>
 
-                    ? " ✅ Available"
+        );
 
-                    : " ❌ Not Available"
+      }
 
-                }
+      else if (hour < 18) {
 
-              </p>
+        return (
 
-            </div>
+          <ul>
 
-            {/* WIFI */}
+            <li>
+              APSRTC → 1:15 PM
+            </li>
 
-            <div className="service-card">
+            <li>
+              APSRTC → 3:00 PM
+            </li>
 
-              <h3>
-                📶 Public WiFi
-              </h3>
+            <li>
+              APSRTC → 5:45 PM
+            </li>
 
-              <ul>
+          </ul>
 
-                <li>
-                  Railway Station WiFi
-                </li>
+        );
 
-                <li>
-                  Bus Stand Free WiFi
-                </li>
+      }
 
-                <li>
-                  Government Office WiFi
-                </li>
+      else {
 
-              </ul>
+        return (
+
+          <ul>
+
+            <li>
+              APSRTC → 7:00 PM
+            </li>
+
+            <li>
+              APSRTC → 8:45 PM
+            </li>
+
+            <li>
+              APSRTC → 10:15 PM
+            </li>
+
+          </ul>
+
+        );
+
+      }
+
+    })()
+
+  }
+
+  <p
+    style={{
+      marginTop:"15px",
+      color:"#aaa"
+    }}
+  >
+
+    ⏱️ Timings updated based on current time
+
+  </p>
+
+</div>
+
+              {/* UBER RAPIDO */}
+
+              <div className="service-card">
+
+                <h3>
+                  🚕 Uber / Rapido
+                </h3>
+
+                <p>
+
+                  Uber:
+
+                  {
+
+                    selectedDistrict?.label?.toLowerCase().includes("nellore") ||
+                    selectedDistrict?.label?.toLowerCase().includes("hyderabad") ||
+                    selectedDistrict?.label?.toLowerCase().includes("chennai") ||
+                    selectedDistrict?.label?.toLowerCase().includes("bengaluru") ||
+                    selectedDistrict?.label?.toLowerCase().includes("mumbai") ||
+                    selectedDistrict?.label?.toLowerCase().includes("delhi")
+
+                      ? " ✅ Available"
+
+                      : " ❌ Not Available"
+
+                  }
+
+                </p>
+
+                <p>
+
+                  Rapido:
+
+                  {
+
+                    selectedDistrict?.label?.toLowerCase().includes("nellore") ||
+                    selectedDistrict?.label?.toLowerCase().includes("hyderabad") ||
+                    selectedDistrict?.label?.toLowerCase().includes("chennai") ||
+                    selectedDistrict?.label?.toLowerCase().includes("bengaluru") ||
+                    selectedDistrict?.label?.toLowerCase().includes("mumbai") ||
+                    selectedDistrict?.label?.toLowerCase().includes("delhi")
+
+                      ? " ✅ Available"
+
+                      : " ❌ Not Available"
+
+                  }
+
+                </p>
+
+              </div>
+
+              {/* WIFI */}
+
+              <div className="service-card">
+
+                <h3>
+                  📶 Public WiFi
+                </h3>
+
+                <ul>
+
+                  <li>
+                    Railway Station WiFi
+                  </li>
+
+                  <li>
+                    Bus Stand Free WiFi
+                  </li>
+
+                  <li>
+                    Government Office WiFi
+                  </li>
+
+                </ul>
+
+              </div>
 
             </div>
 
@@ -691,7 +802,7 @@ function App() {
             <div className="map-card">
 
               <h3>
-                🗺️ Village Map
+                🗺️ Village Satellite Map
               </h3>
 
               <iframe
@@ -700,7 +811,7 @@ function App() {
 
                 width="100%"
 
-                height="400"
+                height="450"
 
                 style={{
                   border: 0,
