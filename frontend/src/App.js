@@ -492,18 +492,6 @@ function App() {
 
           <div className="details-card">
 
-            <div className="section-title">
-
-              <h2>
-                📍 Village Details
-              </h2>
-
-              <span className="live-badge">
-                LIVE
-              </span>
-
-            </div>
-
             {/* INFO */}
 
             <div className="info-grid">
@@ -615,107 +603,107 @@ function App() {
 
               {/* BUS */}
 
-<div className="service-card">
+              <div className="service-card">
 
-  <h3>
-    🚌 Smart Bus Timings
-  </h3>
+                <h3>
+                  🚌 Smart Bus Timings
+                </h3>
 
-  {
+                {
 
-    (() => {
+                  (() => {
 
-      const hour =
-        new Date().getHours();
+                    const hour =
+                      new Date().getHours();
 
-      if (hour < 12) {
+                    if (hour < 12) {
 
-        return (
+                      return (
 
-          <ul>
+                        <ul>
 
-            <li>
-              APSRTC → 6:30 AM
-            </li>
+                          <li>
+                            APSRTC → 6:30 AM
+                          </li>
 
-            <li>
-              APSRTC → 8:15 AM
-            </li>
+                          <li>
+                            APSRTC → 8:15 AM
+                          </li>
 
-            <li>
-              APSRTC → 10:00 AM
-            </li>
+                          <li>
+                            APSRTC → 10:00 AM
+                          </li>
 
-          </ul>
+                        </ul>
 
-        );
+                      );
 
-      }
+                    }
 
-      else if (hour < 18) {
+                    else if (hour < 18) {
 
-        return (
+                      return (
 
-          <ul>
+                        <ul>
 
-            <li>
-              APSRTC → 1:15 PM
-            </li>
+                          <li>
+                            APSRTC → 1:15 PM
+                          </li>
 
-            <li>
-              APSRTC → 3:00 PM
-            </li>
+                          <li>
+                            APSRTC → 3:00 PM
+                          </li>
 
-            <li>
-              APSRTC → 5:45 PM
-            </li>
+                          <li>
+                            APSRTC → 5:45 PM
+                          </li>
 
-          </ul>
+                        </ul>
 
-        );
+                      );
 
-      }
+                    }
 
-      else {
+                    else {
 
-        return (
+                      return (
 
-          <ul>
+                        <ul>
 
-            <li>
-              APSRTC → 7:00 PM
-            </li>
+                          <li>
+                            APSRTC → 7:00 PM
+                          </li>
 
-            <li>
-              APSRTC → 8:45 PM
-            </li>
+                          <li>
+                            APSRTC → 8:45 PM
+                          </li>
 
-            <li>
-              APSRTC → 10:15 PM
-            </li>
+                          <li>
+                            APSRTC → 10:15 PM
+                          </li>
 
-          </ul>
+                        </ul>
 
-        );
+                      );
 
-      }
+                    }
 
-    })()
+                  })()
 
-  }
+                }
 
-  <p
-    style={{
-      marginTop:"15px",
-      color:"#aaa"
-    }}
-  >
+                <p
+                  style={{
+                    marginTop:"15px",
+                    color:"#aaa"
+                  }}
+                >
 
-    ⏱️ Timings updated based on current time
+                  ⏱️ Timings updated based on current time
 
-  </p>
+                </p>
 
-</div>
+              </div>
 
               {/* UBER RAPIDO */}
 
@@ -725,47 +713,129 @@ function App() {
                   🚕 Uber / Rapido
                 </h3>
 
-                <p>
+                {(() => {
 
-                  Uber:
+                  // =========================
+                  // RAPIDO AVAILABLE CITIES
+                  // =========================
 
-                  {
+                  const rapidoCities = [
 
-                    selectedDistrict?.label?.toLowerCase().includes("nellore") ||
-                    selectedDistrict?.label?.toLowerCase().includes("hyderabad") ||
-                    selectedDistrict?.label?.toLowerCase().includes("chennai") ||
-                    selectedDistrict?.label?.toLowerCase().includes("bengaluru") ||
-                    selectedDistrict?.label?.toLowerCase().includes("mumbai") ||
-                    selectedDistrict?.label?.toLowerCase().includes("delhi")
+                    "hyderabad",
+                    "bengaluru",
+                    "chennai",
+                    "mumbai",
+                    "delhi",
+                    "kolkata",
+                    "pune",
+                    "jaipur",
+                    "lucknow",
+                    "vijayawada",
+                    "visakhapatnam",
+                    "warangal",
+                    "mysuru",
+                    "patna",
+                    "bhubaneswar",
+                    "indore",
+                    "chandigarh"
 
-                      ? " ✅ Available"
+                  ];
 
-                      : " ❌ Not Available"
+                  // =========================
+                  // GET FULL LOCATION TEXT
+                  // =========================
 
-                  }
+                  const locationText = `
 
-                </p>
+                    ${selectedState?.label || ""}
+                    ${selectedDistrict?.label || ""}
+                    ${selectedSubdistrict?.label || ""}
+                    ${selectedVillage?.label || ""}
 
-                <p>
+                  `.toLowerCase();
 
-                  Rapido:
+                  // =========================
+                  // CHECK AVAILABILITY
+                  // =========================
 
-                  {
+                  const isAvailable =
 
-                    selectedDistrict?.label?.toLowerCase().includes("nellore") ||
-                    selectedDistrict?.label?.toLowerCase().includes("hyderabad") ||
-                    selectedDistrict?.label?.toLowerCase().includes("chennai") ||
-                    selectedDistrict?.label?.toLowerCase().includes("bengaluru") ||
-                    selectedDistrict?.label?.toLowerCase().includes("mumbai") ||
-                    selectedDistrict?.label?.toLowerCase().includes("delhi")
+                    rapidoCities.some(city =>
+                      locationText.includes(city)
+                    );
 
-                      ? " ✅ Available"
+                  // =========================
+                  // SPECIAL CASE FOR NELLORE
+                  // =========================
 
-                      : " ❌ Not Available"
+                  const isNellore =
+                    locationText.includes("nellore");
 
-                  }
+                  return (
 
-                </p>
+                    <>
+
+                      <p>
+
+                        Uber:
+
+                        {
+
+                          isAvailable
+                            ? " ✅ Available"
+                            : isNellore
+                              ? " ⚠️ Limited Availability"
+                              : " ❌ Not Available"
+
+                        }
+
+                      </p>
+
+                      <p>
+
+                        Rapido:
+
+                        {
+
+                          isAvailable
+                            ? " ✅ Available"
+                            : isNellore
+                              ? " ⚠️ Limited Availability"
+                              : " ❌ Not Available"
+
+                        }
+
+                      </p>
+
+                      {
+
+                        isNellore && (
+
+                          <p
+
+                            style={{
+
+                              marginTop: "10px",
+                              color: "#aaa",
+                              fontSize: "14px"
+
+                            }}
+
+                          >
+
+                            ⚠️ Service availability in Nellore may vary by area and time
+
+                          </p>
+
+                        )
+
+                      }
+
+                    </>
+
+                  );
+
+                })()}
 
               </div>
 
